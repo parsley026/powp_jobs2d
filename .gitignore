@@ -1,5 +1,12 @@
+# Basic
 /target/
 /doc/
 /.classpath
 /.project
 .settings
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
