@@ -1,5 +1,6 @@
 package edu.kis.powp.jobs2d;
 
+import java.awt.*;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.logging.Level;
@@ -9,6 +10,7 @@ import edu.kis.legacy.drawer.panel.DefaultDrawerFrame;
 import edu.kis.legacy.drawer.panel.DrawPanelController;
 import edu.kis.powp.appbase.Application;
 import edu.kis.powp.jobs2d.drivers.adapter.DrawerAdapter;
+import edu.kis.powp.jobs2d.drivers.adapter.LineDrawerAdapter;
 import edu.kis.powp.jobs2d.events.SelectChangeVisibleOptionListener;
 import edu.kis.powp.jobs2d.events.SelectTestFigureOptionListener;
 import edu.kis.powp.jobs2d.features.DrawerFeature;
@@ -16,12 +18,8 @@ import edu.kis.powp.jobs2d.features.DriverFeature;
 
 public class TestJobs2dPatterns {
 	private final static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private static LineDrawerAdapter lineDrawerAdapter; // Added reference for customization
 
-	/**
-	 * Setup test concerning preset figures in context.
-	 * 
-	 * @param application Application context.
-	 */
 	private static void setupPresetTests(Application application) {
 		SelectTestFigureOptionListener selectTestFigureOptionListener = new SelectTestFigureOptionListener(
 				DriverFeature.getDriverManager());
@@ -30,27 +28,56 @@ public class TestJobs2dPatterns {
 		application.addTest("Figure Joe 2", selectTestFigureOptionListener);
 	}
 
-	/**
-	 * Setup driver manager, and set default driver for application.
-	 * 
-	 * @param application Application context.
-	 */
 	private static void setupDrivers(Application application) {
 		Job2dDriver loggerDriver = new LoggerDriver();
 		DriverFeature.addDriver("Logger Driver", loggerDriver);
 		DriverFeature.getDriverManager().setCurrentDriver(loggerDriver);
 
 		Job2dDriver testDriver = new DrawerAdapter(DrawerFeature.getDrawerController());
-		DriverFeature.addDriver("Buggy Simulator", testDriver);
+		DriverFeature.addDriver("Drawer Adapter", testDriver);
+
+		lineDrawerAdapter = new LineDrawerAdapter(DrawerFeature.getDrawerController());
+		DriverFeature.addDriver("Line Drawer Adapter", lineDrawerAdapter);
 
 		DriverFeature.updateDriverInfo();
 	}
 
-	/**
-	 * Auxiliary routines to enable using Buggy Simulator.
-	 * 
-	 * @param application Application context.
-	 */
+	private static void setupLineCustomizationMenu(Application application) {
+		application.addComponentMenu(LineDrawerAdapter.class, "Line Drawer Customization", 0);
+
+		// basic line type
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Basic Line",
+				(ActionEvent e) -> lineDrawerAdapter.useBasicLine());
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Dotted Line",
+				(ActionEvent e) -> lineDrawerAdapter.useDottedLine());
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Special Line",
+				(ActionEvent e) -> lineDrawerAdapter.useSpecialLine());
+
+		// custom line attributes
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Color (Red)",
+				(ActionEvent e) -> lineDrawerAdapter.setColor(Color.RED));
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Color (Green)",
+				(ActionEvent e) -> lineDrawerAdapter.setColor(Color.GREEN));
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Color (Blue)",
+				(ActionEvent e) -> lineDrawerAdapter.setColor(Color.BLUE));
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Thickness 2.5",
+				(ActionEvent e) -> lineDrawerAdapter.setThickness(2.5f));
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Thickness 5",
+				(ActionEvent e) -> lineDrawerAdapter.setThickness(5f));
+
+		application.addComponentMenuElement(LineDrawerAdapter.class, "Set Thickness 7.5",
+				(ActionEvent e) -> lineDrawerAdapter.setThickness(7.5f));
+
+		application.addComponentMenuElementWithCheckBox(LineDrawerAdapter.class, "Dotted Line",
+				(ActionEvent e) -> lineDrawerAdapter.setDotted(true), false);
+	}
+
 	private static void setupDefaultDrawerVisibilityManagement(Application application) {
 		DefaultDrawerFrame defaultDrawerWindow = DefaultDrawerFrame.getDefaultDrawerFrame();
 		application.addComponentMenuElementWithCheckBox(DrawPanelController.class, "Default Drawer Visibility",
@@ -58,11 +85,6 @@ public class TestJobs2dPatterns {
 		defaultDrawerWindow.setVisible(true);
 	}
 
-	/**
-	 * Setup menu for adjusting logging settings.
-	 * 
-	 * @param application Application context.
-	 */
 	private static void setupLogger(Application application) {
 		application.addComponentMenu(Logger.class, "Logger", 0);
 		application.addComponentMenuElement(Logger.class, "Clear log",
@@ -76,9 +98,6 @@ public class TestJobs2dPatterns {
 		application.addComponentMenuElement(Logger.class, "OFF logging", (ActionEvent e) -> logger.setLevel(Level.OFF));
 	}
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -87,6 +106,7 @@ public class TestJobs2dPatterns {
 
 				DriverFeature.setupDriverPlugin(app);
 				setupDrivers(app);
+				setupLineCustomizationMenu(app);
 				setupPresetTests(app);
 				setupLogger(app);
 
@@ -94,5 +114,4 @@ public class TestJobs2dPatterns {
 			}
 		});
 	}
-
 }
