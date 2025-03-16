@@ -1,7 +1,6 @@
 package edu.kis.powp.jobs2d.drivers.adapter;
 
 import edu.kis.legacy.drawer.panel.DrawPanelController;
-import edu.kis.legacy.drawer.shape.ILine;
 import edu.kis.legacy.drawer.shape.LineFactory;
 import edu.kis.legacy.drawer.shape.line.AbstractLine;
 import edu.kis.legacy.drawer.shape.line.BasicLine;
